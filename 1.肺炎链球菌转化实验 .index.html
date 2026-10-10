@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>肺炎链球菌转化实验 · 互动教具</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: #1e2b3c; color: #f0f4fa;
+            min-height: 100vh; display: flex; justify-content: center; align-items: center;
+            padding: 20px; font-size: 28px;
+        }
+
+        .app-container {
+            max-width: 1600px; width: 100%;
+            background: #0e1a26; border-radius: 48px;
+            box-shadow: 0 30px 40px rgba(0,0,0,0.7);
+            padding: 30px 40px 40px; border: 2px solid #3e5a7a;
+        }
+
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 4px solid #3e6b9c;
+            padding-bottom: 20px; margin-bottom: 25px; flex-wrap: wrap;
+        }
+
+        .header h1 {
+            font-size: 52px; font-weight: 700; letter-spacing: 2px;
+            color: #c9e1ff; text-shadow: 0 4px 8px #00000060;
+            display: flex; align-items: center; gap: 15px;
+        }
+
+        .header h1 span {
+            background: #2f4b6e; padding: 8px 20px; border-radius: 60px;
+            font-size: 28px; color: #ffd966; border: 2px solid #ffb347;
+        }
+
+        .case-badge {
+            font-size: 30px; background: #1d3449;
+            padding: 16px 30px; border-radius: 60px;
+            border: 2px dashed #6d9bc3; color: #b8d4f0;
+        }
+
+        .main-panel {
+            display: grid; grid-template-columns: 1.6fr 1fr; gap: 30px;
+        }
+
+        .card {
+            background: #162b3e; border-radius: 36px;
+            padding: 25px 30px;
+            box-shadow: inset 0 0 0 2px #2a4058, 0 12px 18px #00000050;
+            border: 1px solid #3c5e7e;
+        }
+
+        .card-title {
+            font-size: 38px; font-weight: 600; margin-bottom: 20px;
+            color: #ffe484; display: flex; align-items: center; gap: 15px;
+            border-left: 12px solid #ffb347; padding-left: 20px;
+        }
+
+        /* ===== 格里菲思：四组注射器 + 小鼠 ===== */
+        .griffith-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .griffith-card {
+            background: #0c1822;
+            border-radius: 28px;
+            border: 3px solid #35526e;
+            padding: 16px 10px;
+            text-align: center;
+            transition: all .3s;
+        }
+
+        .griffith-card.injected {
+            border-color: #6d9bc3;
+            box-shadow: 0 0 0 3px #1e3a52;
+        }
+
+        .griffith-card.dead {
+            border-color: #b33b3b;
+            box-shadow: 0 0 0 3px #3e1c1c;
+        }
+
+        .griffith-card.alive {
+            border-color: #5f9f4b;
+            box-shadow: 0 0 0 3px #1e3a1e;
+        }
+
+        .griffith-num {
+            display: inline-block;
+            background: #1e3a52; color: #ffd966;
+            font-size: 24px; font-weight: 700;
+            padding: 4px 16px; border-radius: 30px;
+            margin-bottom: 10px;
+        }
+
+        .griffith-card.key .griffith-num {
+            background: #3e1c1c; color: #ff8b8b;
+            border: 2px solid #b33b3b;
+        }
+
+        /* 注射物质标注 */
+        .inject-label {
+            font-size: 22px;
+            font-weight: 700;
+            padding: 8px 12px;
+            border-radius: 20px;
+            margin-bottom: 6px;
+            line-height: 1.3;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .inject-label.label-r {
+            background: #1e3a1e; color: #b1ff9e;
+            border: 2px solid #5f9f4b;
+        }
+
+        .inject-label.label-s {
+            background: #2a1e3e; color: #d8a0ff;
+            border: 2px solid #9b59b6;
+        }
+
+        .inject-label.label-heat {
+            background: #2a2a2a; color: #bdc3c7;
+            border: 2px solid #7a9ec0;
+        }
+
+        .inject-label.label-mix {
+            background: #3e2a1e; color: #ffb347;
+            border: 2px solid #ffb347;
+        }
+
+        /* 注射器 */
+        .syringe-area {
+            position: relative;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .syringe-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            transition: transform .15s;
+            position: relative;
+        }
+
+        .syringe-btn:hover { transform: scale(1.08); }
+        .syringe-btn:active { transform: scale(0.95); }
+        .syringe-btn:disabled { cursor: not-allowed; opacity: .4; }
+
+        .syringe-svg {
+            width: 100px;
+            height: 120px;
+            filter: drop-shadow(0 6px 8px rgba(0,0,0,.6));
+        }
+
+        /* 注射器内的内容物颜色 */
+        .syringe-liquid-r { fill: #a5d6a5; }
+        .syringe-liquid-s { fill: #9b59b6; }
+        .syringe-liquid-heat { fill: #bdc3c7; }
+        .syringe-liquid-mix { fill: url(#mixGradient); }
+
+        /* 注射动画 */
+        .syringe-btn.injecting .syringe-svg {
+            animation: injectShake 0.6s ease;
+        }
+
+        @keyframes injectShake {
+            0% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-8px) rotate(-8deg); }
+            50% { transform: translateY(4px) rotate(4deg); }
+            75% { transform: translateY(-4px) rotate(-2deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+
+        /* 小鼠 */
+        .mouse-stage {
+            position: relative;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 6px;
+        }
+
+        .mouse-svg {
+            width: 90px;
+            height: 70px;
+            transition: all .6s;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,.6));
+        }
+
+        .mouse-svg.dead {
+            filter: grayscale(1) drop-shadow(0 4px 6px rgba(0,0,0,.6));
+            opacity: .55;
+            transform: rotate(12deg) translateY(6px);
+        }
+
+        .mouse-svg.pulse {
+            animation: mousePulse 0.8s ease;
+        }
+
+        @keyframes mousePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        /* 结果标签 */
+        .griffith-result {
+            font-size: 26px;
+            font-weight: 900;
+            padding: 8px 12px;
+            border-radius: 30px;
+            opacity: 0;
+            transition: opacity .4s;
+            margin-top: 4px;
+        }
+
+        .griffith-result.show { opacity: 1; }
+        .griffith-result.alive {
+            background: #1e3a1e; color: #b1ff9e;
+            border: 2px solid #5f9f4b;
+        }
+        .griffith-result.dead {
+            background: #3e1c1c; color: #ff8b8b;
+            border: 2px solid #b33b3b;
+        }
+
+        .griffith-hint-text {
+            font-size: 22px;
+            color: #9ab8d4;
+            margin-top: 4px;
+            line-height: 1.3;
+            min-height: 44px;
+        }
+
+        /* ===== 艾弗里实验区 ===== */
+        .avery-layout {
+            display: flex; gap: 20px; align-items: stretch; margin-bottom: 15px;
+        }
+
+        .avery-fixed {
+            flex: 0 0 200px; background: #102433;
+            border: 3px solid #6d9bc3; border-radius: 28px;
+            padding: 18px 12px; text-align: center;
+            box-shadow: 0 0 0 3px #1e3a52;
+        }
+
+        .avery-fixed .av-label {
+            font-size: 28px; font-weight: 700; color: #ffd966;
+            margin-bottom: 10px; line-height: 1.3;
+            min-height: 60px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .av-tube {
+            width: 70px; height: 130px;
+            border: 4px solid #7a9ec0; border-top: none;
+            border-radius: 0 0 40px 40px;
+            margin: 8px auto;
+            background: linear-gradient(to top, #1d3449 0%, #1d3449 55%, transparent 55%);
+            display: flex; align-items: flex-end; justify-content: center;
+            padding-bottom: 10px; position: relative;
+        }
+
+        .av-colonies {
+            display: flex; flex-wrap: wrap; justify-content: center;
+            gap: 3px; width: 100%; padding: 0 4px;
+        }
+
+        .colony {
+            width: 16px; height: 16px; border-radius: 50%;
+        }
+
+        .colony-r {
+            background: #a5d6a5; border: 1px dashed #6f9f6f;
+        }
+
+        .colony-s {
+            background: #ff6b6b;
+            box-shadow: 0 0 6px #ff3b3b;
+        }
+
+        .avery-fixed .av-result {
+            font-size: 26px; font-weight: 900; color: #b1ff9e; margin-top: 8px;
+        }
+
+        .avery-fixed .av-note {
+            font-size: 24px; color: #b0cbe0; margin-top: 4px; line-height: 1.3;
+        }
+
+        .avery-drag-area {
+            flex: 1; display: flex; flex-direction: column; gap: 15px;
+        }
+
+        .substance-row {
+            display: flex; flex-wrap: wrap; gap: 14px; justify-content: center;
+        }
+
+        .substance-item {
+            background: #2b4a6b; padding: 18px 24px;
+            border-radius: 80px; font-size: 28px; font-weight: 600;
+            color: #fff5d6; border: 3px solid #7fa6c9;
+            cursor: grab; user-select: none;
+            box-shadow: 0 8px 0 #0e1e2e; transition: 0.1s;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .substance-item:active { cursor: grabbing; opacity: 0.8; }
+        .substance-item.dragging { opacity: 0.4; transform: scale(0.98); }
+
+        /* 空白圆形培养基 */
+        .petri-dish {
+            background: radial-gradient(circle at 50% 45%, #1e3b4f, #0c1822 85%);
+            border-radius: 50%;
+            border: 6px dashed #7a9ec0;
+            width: 320px;
+            height: 320px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            font-size: 28px;
+            color: #c6dcf0;
+            gap: 10px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .petri-dish.drag-over {
+            border-color: #ffb347 !important;
+            background: radial-gradient(circle at 50% 45%, #2e4d3a, #0c1822 85%) !important;
+            box-shadow: 0 0 40px rgba(245,176,66,.5);
+        }
+
+        .petri-dish-placeholder {
+            font-size: 26px;
+            color: #7a9ec0;
+            text-align: center;
+            line-height: 1.4;
+            padding: 20px;
+        }
+
+        /* 菌落展示 */
+        .colony-display {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .colony-item {
+            position: absolute;
+            border-radius: 50%;
+            animation: colonyGrow .6s cubic-bezier(.34,1.56,.64,1);
+        }
+
+        @keyframes colonyGrow {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* S型菌落：光滑、有光泽、圆形整齐 */
+        .colony-smooth {
+            background: radial-gradient(circle at 35% 30%, #ffb3b3, #ff6b6b 60%, #c0392b);
+            box-shadow: 0 0 12px rgba(255,107,107,.8), inset -3px -3px 6px rgba(0,0,0,.3);
+            border: 1px solid #b33b3b;
+        }
+
+        /* R型菌落：粗糙、哑光、边缘不规则 */
+        .colony-rough {
+            background: radial-gradient(circle at 35% 30%, #c8e6c8, #a5d6a5 60%, #6f9f6f);
+            box-shadow: 0 0 6px rgba(165,214,165,.6), inset -2px -2px 4px rgba(0,0,0,.2);
+            border: 2px dashed #6f9f6f;
+        }
+
+        .colony-legend {
+            position: absolute;
+            bottom: 8px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 20px;
+            color: #9ab8d4;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .action-btn {
+            background: #f5b042; border: none; border-radius: 60px;
+            padding: 22px 36px; font-size: 32px; font-weight: 700;
+            color: #0b1a28; box-shadow: 0 10px 0 #8b5a1a, 0 8px 18px black;
+            cursor: pointer; transition: 0.1s;
+            width: 100%; letter-spacing: 2px; margin-top: 10px;
+        }
+
+        .action-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 4px 0 #8b5a1a, 0 8px 18px black;
+        }
+
+        .action-btn:disabled {
+            opacity: 0.4; transform: translateY(0);
+            box-shadow: 0 8px 0 #5a3f1a; pointer-events: none;
+        }
+
+        /* ===== 右侧推理板 ===== */
+        .detective-notes {
+            display: flex; flex-direction: column; gap: 25px;
+        }
+
+        .note-paper {
+            background: #f9f3e0; color: #1e2a3a;
+            border-radius: 30px; padding: 25px;
+            box-shadow: inset 0 0 0 3px #c2aa7b, 0 10px 15px #00000060;
+            font-size: 28px; line-height: 1.5;
+            min-height: 180px; font-weight: 500;
+        }
+
+        .note-paper h3 {
+            font-size: 34px; border-bottom: 4px solid #b59b6b;
+            padding-bottom: 12px; margin-bottom: 18px;
+            color: #2c3e4e;
+            display: flex; align-items: center; gap: 12px;
+        }
+
+        .conclusion-badge {
+            background: #3a6b4b; color: white;
+            font-size: 30px; padding: 16px 24px;
+            border-radius: 40px; text-align: center;
+            font-weight: 700; box-shadow: 0 6px 0 #1d3a26;
+            margin-top: 5px;
+        }
+
+        /* ===== 底部 ===== */
+        .footer-actions {
+            margin-top: 30px; display: flex; gap: 20px; justify-content: space-between;
+        }
+
+        .footer-btn {
+            background: #2c4c6e; border: none; border-radius: 60px;
+            padding: 20px 40px; font-size: 32px; font-weight: 600;
+            color: #d9ecff; box-shadow: 0 8px 0 #102334;
+            cursor: pointer; transition: 0.1s;
+            flex: 1; text-align: center; border: 1px solid #6d9bc3;
+        }
+
+        .footer-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #102334;
+        }
+
+        /* ===== 小测 ===== */
+        .quiz-overlay {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #000000dd; display: none;
+            justify-content: center; align-items: center;
+            z-index: 1000; padding: 30px;
+        }
+
+        .quiz-modal {
+            background: #142433; border-radius: 60px;
+            padding: 50px; max-width: 1000px; width: 100%;
+            border: 6px solid #ffb347;
+            box-shadow: 0 40px 60px black; font-size: 32px;
+        }
+
+        .quiz-question {
+            font-size: 40px; font-weight: 700; color: #ffe484;
+            margin-bottom: 40px; line-height: 1.4;
+        }
+
+        .quiz-options {
+            display: flex; flex-direction: column; gap: 20px; margin-bottom: 40px;
+        }
+
+        .quiz-option {
+            background: #1e3a52; padding: 25px 30px;
+            border-radius: 40px; font-size: 34px;
+            color: #e2efff; border: 2px solid #547ea0;
+            cursor: pointer; transition: 0.1s;
+        }
+
+        .quiz-option:hover { background: #2d5779; }
+        .quiz-option.correct { background: #2c7840; border-color: #b1ff9e; }
+        .quiz-option.wrong { background: #7a2e2e; border-color: #ff8b8b; }
+
+        .quiz-feedback {
+            font-size: 32px; margin-top: 20px;
+            color: #ffd966; min-height: 80px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-panel { grid-template-columns: 1fr; }
+            .header h1 { font-size: 44px; }
+            .avery-layout { flex-direction: column; }
+            .avery-fixed { flex: 1; }
+        }
+
+        @media (max-width: 800px) {
+            .griffith-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        p, span, div, button, label, h1, h2, h3, h4, li {
+            font-size: 28px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>🧬 肺炎链球菌转化实验 <span>格里菲思 & 艾弗里</span></h1>
+            <div class="case-badge">📁 卷宗 #DNA-1944</div>
+        </div>
+
+        <div class="main-panel">
+            <div class="card">
+                <div class="card-title">🔬 实验操作台</div>
+
+                <!-- 格里菲思 -->
+                <div style="margin-bottom: 20px; font-size: 32px; color: #ffd966; font-weight: 600;">一、格里菲思 · 体内转化实验（1928）</div>
+                <div style="font-size: 24px; color: #9ab8d4; margin-bottom: 14px;">点击注射器，观察注射过程和小鼠反应</div>
+
+                <div class="griffith-grid" id="griffithGrid">
+                    <!-- 第1组：R型活菌 -->
+                    <div class="griffith-card" id="gc1" data-griffith="r">
+                        <div class="griffith-num">第①组</div>
+                        <div class="inject-label label-r">注射 R型活菌</div>
+                        <div class="syringe-area">
+                            <button class="syringe-btn" data-inject="r" title="点击注射">
+                                <svg class="syringe-svg" viewBox="0 0 100 120">
+                                    <rect x="35" y="20" width="30" height="60" rx="6" fill="#e8eef5" stroke="#7a9ec0" stroke-width="3"/>
+                                    <rect x="38" y="45" width="24" height="32" rx="3" class="syringe-liquid-r"/>
+                                    <line x1="65" y1="30" x2="72" y2="30" stroke="#7a9ec0" stroke-width="2"/>
+                                    <line x1="65" y1="42" x2="72" y2="42" stroke="#7a9ec0" stroke-width="2"/>
+                                    <line x1="65" y1="54" x2="72" y2="54" stroke="#7a9ec0" stroke-width="2"/>
+                                    <line x1="65" y1="66" x2="72" y2="66" stroke="#7a9ec0" stroke-width="2"/>
+                                    <rect x="30" y="10" width="40" height="10" rx="3" fill="#7a9ec0"/>
+                                    <rect x="46" y="0" width="8" height="12" fill="#7a9ec0"/>
+                                    <rect x="47" y="80" width="6" height="30" fill="#bdc3c7"/>
+                                    <polygon points="47,110 53,110 50,118" fill="#95a5a6"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="mouse-stage">
+                            <svg class="mouse-svg" id="mouse1" viewBox="0 0 100 80">
+                                <ellipse cx="50" cy="50" rx="35" ry="22" fill="#c9a87c" stroke="#8d6e4a" stroke-width="2"/>
+                                <circle cx="20" cy="42" r="12" fill="#c9a87c" stroke="#8d6e4a" stroke-width="2"/>
+                                <circle cx="15" cy="38" r="3" fill="#1a1a1a"/>
+                                <circle cx="20" cy="34" r="5" fill="#e8b88a" stroke="#8d6e4a" stroke-width="1.5"/>
+                                <circle cx="28" cy="32" r="4" fill="#e8b88a" stroke="#8d6e4a" stroke-width="1.5"/>
+                                <path d="M85,50 Q95,45 92,55" stroke="#8d6e4a" stroke-width="3" fill="none"/>
+                                <circle cx="15" cy="36" r="1.5" fill="#fff"/>
+                                <circle cx="40" cy="65" r="5" fill="#c9a87c" stroke="#8d6e4a" stroke-width="1.5"/>
+                                <circle cx="60" cy="65" r="5" fill="#c9a87c" stroke="#8d6e4a" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                        <div class="griffith-result" id="result1"></div>
+                        <div class="griffith-hint-text" id="hint1">点击注射器注射</div>
+                    </div>
+
+                    <!-- 第2组：S型活菌 -->
+                    <div class="griffith-card" id="gc2" data-griffith="s">
+                        <div class="griffith-num">第②组</div>
+                        <div class="inject-label label-s">注射 S型活菌</div>
+                        <div class="syringe-area">
+                            <button class="syringe-btn" data-inject="s" title="点击注射">
+                                <svg class="syringe-svg" viewBox="0 0 100 120">
+                                    <rect x="35" y="20" width="30" height="60" rx="6" fill="#e8eef5" stroke="#7a9ec0" stroke-width="3"/>
+                                    <rect x="38" y="45" width="24" height="32" rx="3" class="syringe-liquid-s"/>
+                                    <line x1="65" y1="30" x2="72" y2="30" stroke="#7a9ec0" stroke-width="2"/>
+                                    <line x1="65" y1="42" x2="72" y2="42" stroke="#7a9ec0" stroke-width="2"/>
+                                    <line x1="65" y1="54" x2="72" y2="54" stroke="#7a9ec0" stroke-width="2"/>
+                                    <line x1="65" y1="66" x2="72" y2="66" stroke="#7a9ec0" stroke-width="2"/>
+                                    <rect x="30" y="10" width="40" height="10" rx="3" fill="#7a9ec0"/>
+                                    <rect x="46" y="0" width="8" height="12" fill="#7a9ec0"/>
+                                    <rect x="47" y="80" width="6" height="30" fill="#bdc3c7"/>
+                                    <polygon points="47,110 53,110 50,118" fill="#95a5a6"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="mouse-stage">
+                            <svg class="mouse-svg" id="mouse2" viewBox="0 0 100 80">
+                                <ellipse cx="50" cy="50" rx="35" ry="22" fill="#c9a87c" stroke="#8d6e4a" stroke-width="2"/>
+                                <circle cx="20" cy="42" r="12" fill="#c9a87c" stroke="#8d6e4a" stroke-width="2"/>
+                                <circle cx="15" cy="38" r="3" fill="#1a1a1a"/>
+                                <circle cx="20" cy="34" r="5" fill="#e8b88a" stroke="#8d6e4a" stroke-width="1.5"/>
+                                <circle cx="28" cy="32" r="4" fill="#e8b88a" stroke="#8d6e4a" stroke-width="1.5"/>
+                                <path d="M85,50 Q95,45 92,55" stroke="#8d6e4a" stroke-width="3" fill="none"/>
+                                <circle cx="15" cy="36" r="1.5" fill="#fff"/>
+                                <circle cx="40" cy="65" r="5" fill="#c9a87c" stroke="#8d6e4a" stroke-width="1.5"/>
+                                <circle cx="60" cy="65" r="5" fill="#c9a87c" stroke="#8d6e4a" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                        <div class="griffith-result" id="result2"></div>
+                        <div class="griffith-hint-text" id="hint2">点击注射器注射</div>
+                    </div>
+
+                    <!-- 第3组：加热杀死的S型菌 -->
+                    <div class="griffith-card" id="gc3" data-griffith="heat">
+                        <div class="griffith-num">第③组</div>
+                        <div class="inject-label label-heat">注射 加热杀死的S型菌</div>
+                        <div class="syringe-area">
+                            <button class="syringe-btn" data-inject="heat" title="点击注射">
+                                <svg class="syringe-svg" viewBox="0 0 100 120">
+                                    <rect x="35" y="20" width="30" height="60" rx="6" fill="#e8eef5" stroke="#7a9ec0" stroke-width="3"/>
+                                    <rect x="38" y="45" width="24" height="32" rx="3" class="syringe-liquid-heat"/>
+                                    <line x1="65" y1="30" x2="72" y2="30" stroke="#7a9ec0" stroke-width="2"/>
+                                    <line x1="65" y1="42" x2="72" y2="42" stroke="#7a9ec0" stroke-width="2"/>
+                                    <line x1="65" y1="54" x2="72" y2="54" stroke="#7a9ec0" stroke-width="2"/>
+                                    <line x1="65" y1="66" x2="72" y2="66" stroke="#7a9ec0" stroke-width="2"/>
+                                    <rect x="30" y="10" width="40" height="10" rx="3" fill="#7a9ec0"/>
+                                    <rect x="46" y="0" width="8" height="12" fill="#7a9ec0"/>
+                                    <rect x="47" y="80" width="6" height="30" fill="#bdc3c7"/>
+                                    <polygon points="47,110 53,110 50,118" fill="#95a5a6"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="mouse-stage">
+                            <svg class="mouse-svg" id="mouse3" viewBox="0 0 100 80">
+                                <ellipse cx="50" cy="50" rx="35" ry="22" fill="#c9a87c" stroke="#8d6e4a" stroke-width="2"/>
+                                <circle cx="20" cy="42" r="12" fill="#c9a87c" stroke="#8d6e4a" stroke-width="2"/>
+                                <circle cx="15" cy="38" r="3" fill="#1a1a1a"/>
+                                <circle cx="20" cy="34" r="5" fill="#e8b88a" stroke="#8d6e4a" stroke-width="1.5"/>
+                                <circle cx="28" cy="32" r="4" fill="#e8b88a" stroke="#8d6e4a" stroke-width="1.5"/>
+                                <path d="M85,50 Q95,45 92,55" stroke="#8d6e4a" stroke-width="3" fill="none"/>
+                                <circle cx="15" cy="36" r="1.5" fill="#fff"/>
+                                <circle cx="40" cy="65" r="5" fill="#c9a87c" stroke="#8d6e4a" stroke-width="1.5"/>
+                                <circle cx="60" cy="65" r="5" fill="#c9a87c" stroke="#8d6e4a" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                        <div class="griffith-result" id="result3"></div>
+                        <div class="griffith-hint-text" id="hint3">点击注射器注射</div>
+                    </div>
+
+                    <!-- 第4组：R型活菌 + 加热杀死的S型菌 -->
+                    <div class="griffith-card key" id="gc4" data-griffith="mix">
+                        <div class="griffith-num">第④组 关键</div>
+                        <div class="inject-label label-mix">注射 R型活菌 + 加热杀死的S型菌</div>
+                        <div class="syringe-area">
+                            <button class="syringe-btn" data-inject="mix" title="点击注射">
+                                <svg class="syringe-svg" viewBox="0 0 100 120">
+                                    <defs>
+                                        <linearGradient id="mixGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stop-color="#a5d6a5"/>
+                                            <stop offset="50%" stop-color="#a5d6a5"/>
+                                            <stop offset="50%" stop-color="#bdc3c7"/>
+                                            <stop offset="100%" stop-color="#bdc3c7"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <rect x="35" y="20" width="30" height="60" rx="6" fill="#e8eef5" stroke="#7a9ec0" stroke-width="3"/>
+                                    <rect x="38" y="45" width="24" height="32" rx="3" fill="url(#mixGradient)"/>
+                                    <line x1="65" y1="30" x2="72" y2="30" stroke="#7a9ec0" stroke-width="2"/>
+                                    <line x1="65" y1="42" x2="72" y2="42" stroke="#7a9ec0" stroke-width="2"/>
+                                    <line x1="65" y1="54" x2="72" y2="54" stroke="#7a9ec0" stroke-width="2"/>
+                                    <line x1="65" y1="66" x2="72" y2="66" stroke="#7a9ec0" stroke-width="2"/>
+                                    <rect x="30" y="10" width="40" height="10" rx="3" fill="#7a9ec0"/>
+                                    <rect x="46" y="0" width="8" height="12" fill="#7a9ec0"/>
+                                    <rect x="47" y="80" width="6" height="30" fill="#bdc3c7"/>
+                                    <polygon points="47,110 53,110 50,118" fill="#95a5a6"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="mouse-stage">
+                            <svg class="mouse-svg" id="mouse4" viewBox="0 0 100 80">
+                                <ellipse cx="50" cy="50" rx="35" ry="22" fill="#c9a87c" stroke="#8d6e4a" stroke-width="2"/>
+                                <circle cx="20" cy="42" r="12" fill="#c9a87c" stroke="#8d6e4a" stroke-width="2"/>
+                                <circle cx="15" cy="38" r="3" fill="#1a1a1a"/>
+                                <circle cx="20" cy="34" r="5" fill="#e8b88a" stroke="#8d6e4a" stroke-width="1.5"/>
+                                <circle cx="28" cy="32" r="4" fill="#e8b88a" stroke="#8d6e4a" stroke-width="1.5"/>
+                                <path d="M85,50 Q95,45 92,55" stroke="#8d6e4a" stroke-width="3" fill="none"/>
+                                <circle cx="15" cy="36" r="1.5" fill="#fff"/>
+                                <circle cx="40" cy="65" r="5" fill="#c9a87c" stroke="#8d6e4a" stroke-width="1.5"/>
+                                <circle cx="60" cy="65" r="5" fill="#c9a87c" stroke="#8d6e4a" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                        <div class="griffith-result" id="result4"></div>
+                        <div class="griffith-hint-text" id="hint4">点击注射器注射</div>
+                    </div>
+                </div>
+
+                <!-- 艾弗里 -->
+                <div style="margin: 30px 0 15px; font-size: 32px; color: #ffd966; font-weight: 600;">二、艾弗里 · 体外转化实验（1944）—— 酶解鉴定法</div>
+
+                <div class="avery-layout">
+                    <!-- 固定卡片：不加酶 -->
+                    <div class="avery-fixed" id="averyControl">
+                        <div class="av-label">① 不加酶<br>（对照组）</div>
+                        <div class="av-tube">
+                            <div class="av-colonies">
+                                <span class="colony colony-r"></span><span class="colony colony-s"></span>
+                                <span class="colony colony-r"></span><span class="colony colony-s"></span>
+                                <span class="colony colony-s"></span>
+                            </div>
+                        </div>
+                        <div class="av-result">观察到R型和S型细菌</div>
+                        <div class="av-note">S型提取液含转化因子</div>
+                    </div>
+
+                    <!-- 右侧拖拽区 -->
+                    <div class="avery-drag-area">
+                        <div class="substance-row" id="substanceRow">
+                            <div class="substance-item" draggable="true" data-substance="proteinase">🧪 蛋白酶</div>
+                            <div class="substance-item" draggable="true" data-substance="rnase">🧪 RNA酶</div>
+                            <div class="substance-item" draggable="true" data-substance="esterase">🧪 酯酶</div>
+                            <div class="substance-item" draggable="true" data-substance="dnase">🧪 DNA酶</div>
+                        </div>
+
+                        <!-- 空白圆形培养基 -->
+                        <div class="petri-dish" id="petriDish">
+                            <div class="petri-dish-placeholder" id="petriPlaceholder">
+                                ⬇️ 将酶拖拽到培养基 ⬇️
+                            </div>
+                            <div class="colony-display" id="colonyDisplay" style="display:none;"></div>
+                        </div>
+
+                        <button class="action-btn" id="cultureBtn" disabled>🧪 培养并观察</button>
+
+                        <div style="font-size: 28px; padding: 12px; background: #0e1d2b; border-radius: 40px; margin-top: 10px; text-align: center;" id="averyResult">
+                            等待实验...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧推理板 -->
+            <div class="detective-notes">
+                <div class="note-paper">
+                    <h3>📋 线索记录</h3>
+                    <div id="clueLog">▸ 等待实验数据...</div>
+                </div>
+                <div class="note-paper">
+                    <h3>🔎 推理结论</h3>
+                    <div id="conclusionLog">尚未得出结论，继续调查。</div>
+                </div>
+                <div class="conclusion-badge" id="finalConclusion">🧬 转化因子 = ？</div>
+            </div>
+        </div>
+
+        <div class="footer-actions">
+            <button class="footer-btn" id="resetBtn">🔄 重置实验</button>
+            <button class="footer-btn" id="quizBtn">📝 结案小测</button>
+        </div>
+    </div>
+
+    <!-- 小测弹窗 -->
+    <div class="quiz-overlay" id="quizOverlay">
+        <div class="quiz-modal">
+            <div class="quiz-question" id="quizQuestion">题目加载中...</div>
+            <div class="quiz-options" id="quizOptions"></div>
+            <div class="quiz-feedback" id="quizFeedback"></div>
+            <button class="footer-btn" style="margin-top: 30px;" id="closeQuizBtn">关闭测验</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ===== 格里菲思实验：四组注射器 =====
+            const clueLog = document.getElementById('clueLog');
+            const conclusionLog = document.getElementById('conclusionLog');
+            const finalConclusion = document.getElementById('finalConclusion');
+            const syringeBtns = document.querySelectorAll('.syringe-btn');
+
+            // 每组数据
+            const griffithData = {
+                'r': {
+                    mouseId: 'mouse1',
+                    resultId: 'result1',
+                    hintId: 'hint1',
+                    cardId: 'gc1',
+                    alive: true,
+                    resultText: '✅ 小鼠存活',
+                    hint: 'R型活菌不致病，小鼠正常。',
+                    clue: '第①组：注射R型活菌 → 小鼠存活',
+                    conclusion: 'R型菌无致病性。继续实验...'
+                },
+                's': {
+                    mouseId: 'mouse2',
+                    resultId: 'result2',
+                    hintId: 'hint2',
+                    cardId: 'gc2',
+                    alive: false,
+                    resultText: '❌ 小鼠死亡',
+                    hint: 'S型活菌有荚膜，致病，小鼠死亡。',
+                    clue: '第②组：注射S型活菌 → 小鼠死亡',
+                    conclusion: 'S型菌有致病性。继续实验...'
+                },
+                'heat': {
+                    mouseId: 'mouse3',
+                    resultId: 'result3',
+                    hintId: 'hint3',
+                    cardId: 'gc3',
+                    alive: true,
+                    resultText: '✅ 小鼠存活',
+                    hint: '加热杀死的S型菌失去致病能力。',
+                    clue: '第③组：注射加热杀死的S型菌 → 小鼠存活',
+                    conclusion: '加热杀死的S型菌无致病性。继续实验...'
+                },
+                'mix': {
+                    mouseId: 'mouse4',
+                    resultId: 'result4',
+                    hintId: 'hint4',
+                    cardId: 'gc4',
+                    alive: false,
+                    resultText: '❌ 小鼠死亡！',
+                    hint: 'R型活菌 + 加热杀死的S型菌 → 小鼠死亡！血液中分离出S型活菌！',
+                    clue: '第④组：注射R型活菌+加热杀死的S型菌 → 小鼠死亡！',
+                    conclusion: '第④组中R型菌转化为了S型菌，存在“转化因子”！'
+                }
+            };
+
+            // 记录已完成的组
+            const completedGroups = new Set();
+
+            function performInjection(type) {
+                if (completedGroups.has(type)) return;
+                const data = griffithData[type];
+                if (!data) return;
+
+                const btn = document.querySelector(`.syringe-btn[data-inject="${type}"]`);
+                const mouse = document.getElementById(data.mouseId);
+                const result = document.getElementById(data.resultId);
+                const hint = document.getElementById(data.hintId);
+                const card = document.getElementById(data.cardId);
+
+                // 注射动画
+                btn.classList.add('injecting');
+                setTimeout(() => btn.classList.remove('injecting'), 600);
+
+                // 标记卡片状态
+                card.classList.add('injected');
+                if (data.alive) {
+                    card.classList.add('alive');
+                } else {
+                    card.classList.add('dead');
+                }
+
+                // 小鼠动画
+                mouse.classList.add('pulse');
+                setTimeout(() => mouse.classList.remove('pulse'), 800);
+
+                // 延迟后显示结果
+                setTimeout(() => {
+                    // 小鼠状态
+                    if (!data.alive) {
+                        mouse.classList.add('dead');
+                    }
+
+                    // 结果标签
+                    result.textContent = data.resultText;
+                    result.className = 'griffith-result show ' + (data.alive ? 'alive' : 'dead');
+
+                    // 提示文字
+                    hint.textContent = data.hint;
+
+                    // 禁用按钮
+                    btn.disabled = true;
+
+                    // 记录
+                    completedGroups.add(type);
+                    updateClueLog(type, data);
+
+                    // 检查是否全部完成
+                    if (completedGroups.size === 4) {
+                        finalConclusion.textContent = '🧬 转化因子 = DNA（待艾弗里实验确认）';
+                    }
+                }, 500);
+            }
+
+            function updateClueLog(type, data) {
+                // 基础线索
+                let clueHTML = '';
+                if (type === 'r') {
+                    clueHTML = '▸ ' + data.clue + '<br>▸ R型活菌不致病，小鼠正常。';
+                } else if (type === 's') {
+                    clueHTML = '▸ ' + data.clue + '<br>▸ S型活菌有荚膜，致病。';
+                } else if (type === 'heat') {
+                    clueHTML = '▸ ' + data.clue + '<br>▸ 加热杀死的S型菌失去致病能力。';
+                } else if (type === 'mix') {
+                    clueHTML = '▸ ' + data.clue + '<br>▸ <strong style="color:#c0392b;">第四组中R型菌转化为了S型菌，存在“转化因子”。</strong>';
+                }
+
+                // 如果已完成多组，展示所有线索
+                if (completedGroups.size > 1) {
+                    let allClues = '';
+                    ['r', 's', 'heat', 'mix'].forEach(t => {
+                        if (completedGroups.has(t)) {
+                            const d = griffithData[t];
+                            if (t === 'mix') {
+                                allClues += '▸ ' + d.clue + '<br>▸ <strong style="color:#c0392b;">第四组中R型菌转化为了S型菌，存在“转化因子”。</strong><br>';
+                            } else {
+                                allClues += '▸ ' + d.clue + '<br>';
+                            }
+                        }
+                    });
+                    clueLog.innerHTML = allClues || '▸ 等待实验数据...';
+                } else {
+                    clueLog.innerHTML = clueHTML;
+                }
+
+                // 更新结论
+                if (completedGroups.has('mix')) {
+                    conclusionLog.innerHTML = '🔍 格里菲思证明存在“转化因子”，但未证明其化学本质。';
+                } else {
+                    conclusionLog.innerHTML = data.conclusion;
+                }
+            }
+
+            // 绑定注射器点击
+            syringeBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const type = this.dataset.inject;
+                    performInjection(type);
+                });
+            });
+
+            // ===== 艾弗里实验：拖拽酶 + 菌落生长 =====
+            const petriDish = document.getElementById('petriDish');
+            const petriPlaceholder = document.getElementById('petriPlaceholder');
+            const colonyDisplay = document.getElementById('colonyDisplay');
+            const cultureBtn = document.getElementById('cultureBtn');
+            const averyResult = document.getElementById('averyResult');
+            const substanceItems = document.querySelectorAll('.substance-item');
+
+            let currentEnzyme = null;
+
+            substanceItems.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', e.currentTarget.dataset.substance);
+                    e.currentTarget.classList.add('dragging');
+                });
+                item.addEventListener('dragend', (e) => {
+                    e.currentTarget.classList.remove('dragging');
+                });
+            });
+
+            petriDish.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                petriDish.classList.add('drag-over');
+            });
+
+            petriDish.addEventListener('dragleave', () => {
+                petriDish.classList.remove('drag-over');
+            });
+
+            petriDish.addEventListener('drop', (e) => {
+                e.preventDefault();
+                petriDish.classList.remove('drag-over');
+                const enzyme = e.dataTransfer.getData('text/plain');
+                if (!enzyme || !['proteinase','rnase','esterase','dnase'].includes(enzyme)) return;
+
+                currentEnzyme = enzyme;
+
+                // 隐藏占位文字，显示菌落区
+                petriPlaceholder.style.display = 'none';
+                colonyDisplay.style.display = 'flex';
+                colonyDisplay.innerHTML = `<span style="font-size:60px;">🧪</span><div style="font-size:24px;color:#9ab8d4;width:100%;text-align:center;margin-top:8px;">已加入：${getEnzymeName(enzyme)}<br>点击“培养并观察”</div>`;
+
+                // 启用培养按钮
+                cultureBtn.disabled = false;
+            });
+
+            function getEnzymeName(enzyme) {
+                return {
+                    'proteinase': '蛋白酶',
+                    'rnase': 'RNA酶',
+                    'esterase': '酯酶',
+                    'dnase': 'DNA酶'
+                }[enzyme] || enzyme;
+            }
+
+            // 生成菌落
+            function generateColonies(showS) {
+                colonyDisplay.innerHTML = '';
+                // 生成随机位置和大小
+                const dishSize = 320;
+                const padding = 50;
+                const usableSize = dishSize - padding * 2;
+
+                function randPos() {
+                    const angle = Math.random() * Math.PI * 2;
+                    const r = Math.random() * (usableSize / 2 - 20);
+                    const cx = dishSize / 2 + Math.cos(angle) * r;
+                    const cy = dishSize / 2 + Math.sin(angle) * r;
+                    return { x: cx, y: cy };
+                }
+
+                // R型菌落：粗糙，数量多
+                const rCount = 8 + Math.floor(Math.random() * 5);
+                for (let i = 0; i < rCount; i++) {
+                    const pos = randPos();
+                    const size = 18 + Math.random() * 14;
+                    const div = document.createElement('div');
+                    div.className = 'colony-item colony-rough';
+                    div.style.width = size + 'px';
+                    div.style.height = size + 'px';
+                    div.style.left = (pos.x - size/2) + 'px';
+                    div.style.top = (pos.y - size/2) + 'px';
+                    div.style.animationDelay = (i * 0.06) + 's';
+                    colonyDisplay.appendChild(div);
+                }
+
+                // 如果有S型菌落：光滑，数量少
+                if (showS) {
+                    const sCount = 3 + Math.floor(Math.random() * 3);
+                    for (let i = 0; i < sCount; i++) {
+                        const pos = randPos();
+                        const size = 22 + Math.random() * 16;
+                        const div = document.createElement('div');
+                        div.className = 'colony-item colony-smooth';
+                        div.style.width = size + 'px';
+                        div.style.height = size + 'px';
+                        div.style.left = (pos.x - size/2) + 'px';
+                        div.style.top = (pos.y - size/2) + 'px';
+                        div.style.animationDelay = (i * 0.1 + 0.5) + 's';
+                        colonyDisplay.appendChild(div);
+                    }
+                }
+
+                // 图例
+                const legend = document.createElement('div');
+                legend.className = 'colony-legend';
+                legend.innerHTML = `
+                    <div class="legend-item"><span class="legend-dot" style="background:radial-gradient(circle at 35% 30%,#c8e6c8,#a5d6a5 60%,#6f9f6f);border:2px dashed #6f9f6f;"></span>R型（粗糙）</div>
+                    ${showS ? '<div class="legend-item"><span class="legend-dot" style="background:radial-gradient(circle at 35% 30%,#ffb3b3,#ff6b6b 60%,#c0392b);border:1px solid #b33b3b;"></span>S型（光滑）</div>' : ''}
+                `;
+                colonyDisplay.appendChild(legend);
+            }
+
+            cultureBtn.addEventListener('click', () => {
+                if (!currentEnzyme) return;
+
+                let resultText = '';
+                let showS = false;
+
+                if (currentEnzyme === 'dnase') {
+                    resultText = '❌ 不转化！只观察到R型细菌。DNA被DNA酶分解，转化因子被破坏。';
+                    showS = false;
+                } else {
+                    resultText = `✅ 观察到R型和S型细菌！加入${getEnzymeName(currentEnzyme)}后，转化仍发生。`;
+                    showS = true;
+                }
+
+                generateColonies(showS);
+                averyResult.innerHTML = resultText;
+
+                // 更新线索
+                clueLog.innerHTML += `<br>▸ 【艾弗里】加${getEnzymeName(currentEnzyme)} → ${resultText}`;
+
+                if (currentEnzyme === 'dnase') {
+                    conclusionLog.innerHTML = '🔬 DNA酶能阻止转化，其他酶不能 → 转化因子是DNA！';
+                    finalConclusion.textContent = '🧬 转化因子 = DNA（脱氧核糖核酸）';
+                } else {
+                    conclusionLog.innerHTML = `🔬 ${getEnzymeName(currentEnzyme)}不能阻止转化 → 该物质不是转化因子。继续实验...`;
+                }
+
+                cultureBtn.disabled = true;
+            });
+
+            // ===== 重置 =====
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                // 重置格里菲思
+                completedGroups.clear();
+                ['1', '2', '3', '4'].forEach(i => {
+                    const mouse = document.getElementById('mouse' + i);
+                    mouse.classList.remove('dead', 'pulse');
+                    const result = document.getElementById('result' + i);
+                    result.className = 'griffith-result';
+                    result.textContent = '';
+                    const hint = document.getElementById('hint' + i);
+                    hint.textContent = '点击注射器注射';
+                });
+                ['gc1', 'gc2', 'gc3', 'gc4'].forEach(id => {
+                    const card = document.getElementById(id);
+                    card.classList.remove('injected', 'alive', 'dead');
+                });
+                document.querySelectorAll('.syringe-btn').forEach(btn => {
+                    btn.disabled = false;
+                    btn.classList.remove('injecting');
+                });
+
+                // 重置艾弗里
+                currentEnzyme = null;
+                petriPlaceholder.style.display = 'block';
+                colonyDisplay.style.display = 'none';
+                colonyDisplay.innerHTML = '';
+                averyResult.textContent = '等待实验...';
+                cultureBtn.disabled = true;
+
+                // 记录
+                clueLog.innerHTML = '▸ 等待实验数据...';
+                conclusionLog.innerHTML = '尚未得出结论，继续调查。';
+                finalConclusion.textContent = '🧬 转化因子 = ？';
+            });
+
+            // ===== 小测 =====
+            const quizOverlay = document.getElementById('quizOverlay');
+            const quizQuestion = document.getElementById('quizQuestion');
+            const quizOptions = document.getElementById('quizOptions');
+            const quizFeedback = document.getElementById('quizFeedback');
+            const closeQuizBtn = document.getElementById('closeQuizBtn');
+            const quizBtn = document.getElementById('quizBtn');
+
+            const quizData = [
+                {
+                    question: '1. 格里菲思实验中，哪一组小鼠死亡并证明了“转化因子”的存在？',
+                    options: ['A. 注射R型活菌', 'B. 注射S型活菌', 'C. 注射加热杀死的S型菌', 'D. 注射R型活菌+加热杀死的S型菌'],
+                    correct: 3,
+                    feedback: '✅ 正确答案是D。第四组小鼠死亡，说明加热杀死的S型菌中存在某种物质使R型菌转化为S型菌。'
+                },
+                {
+                    question: '2. 艾弗里实验中，加入哪种酶后培养皿中只出现R型菌落？',
+                    options: ['A. 蛋白酶', 'B. RNA酶', 'C. 酯酶', 'D. DNA酶'],
+                    correct: 3,
+                    feedback: '✅ 正确答案是D。DNA酶分解了DNA，因此无法发生转化，证明DNA是转化因子。'
+                },
+                {
+                    question: '3. 为什么说DNA是“主要”的遗传物质？',
+                    options: ['A. 所有生物都以DNA为遗传物质', 'B. 绝大多数生物的遗传物质是DNA，少数病毒是RNA', 'C. DNA比RNA稳定', 'D. 只有DNA能控制性状'],
+                    correct: 1,
+                    feedback: '✅ 正确答案是B。绝大多数生物（细胞生物和DNA病毒）的遗传物质是DNA，少数病毒（如烟草花叶病毒）以RNA为遗传物质，因此说DNA是主要遗传物质。'
+                }
+            ];
+
+            let currentQuizIndex = 0;
+
+            function showQuiz() {
+                currentQuizIndex = 0;
+                quizOverlay.style.display = 'flex';
+                renderQuiz();
+            }
+
+            function renderQuiz() {
+                const q = quizData[currentQuizIndex];
+                quizQuestion.textContent = q.question;
+                quizOptions.innerHTML = '';
+                quizFeedback.textContent = '';
+
+                q.options.forEach((opt, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'quiz-option';
+                    div.textContent = opt;
+                    div.dataset.index = idx;
+                    div.addEventListener('click', (e) => {
+                        const selected = parseInt(e.currentTarget.dataset.index);
+                        const isCorrect = selected === q.correct;
+                        document.querySelectorAll('.quiz-option').forEach(optDiv => {
+                            optDiv.classList.remove('correct', 'wrong');
+                        });
+                        if (isCorrect) {
+                            e.currentTarget.classList.add('correct');
+                            quizFeedback.textContent = q.feedback;
+                        } else {
+                            e.currentTarget.classList.add('wrong');
+                            document.querySelectorAll('.quiz-option').forEach(optDiv => {
+                                if (parseInt(optDiv.dataset.index) === q.correct) {
+                                    optDiv.classList.add('correct');
+                                }
+                            });
+                            quizFeedback.textContent = '❌ 再想想... 正确答案已标绿。 ' + q.feedback;
+                        }
+                        if (isCorrect) {
+                            setTimeout(() => {
+                                if (currentQuizIndex < quizData.length - 1) {
+                                    currentQuizIndex++;
+                                    renderQuiz();
+                                } else {
+                                    quizQuestion.textContent = '🎉 测验完成！所有题目已答完。';
+                                    quizOptions.innerHTML = '';
+                                    quizFeedback.textContent = '点击关闭按钮返回课堂。';
+                                }
+                            }, 1600);
+                        }
+                    });
+                    quizOptions.appendChild(div);
+                });
+            }
+
+            quizBtn.addEventListener('click', showQuiz);
+            closeQuizBtn.addEventListener('click', () => {
+                quizOverlay.style.display = 'none';
+            });
+            quizOverlay.addEventListener('click', (e) => {
+                if (e.target === quizOverlay) quizOverlay.style.display = 'none';
+            });
+
+        })();
+    </script>
+</body>
+</html>
